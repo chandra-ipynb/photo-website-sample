@@ -1,0 +1,12 @@
+.DS_Store
+__pycache__/
+*.pyc
+.idea/
+.vscode/
+
+# Keep the local Vistoriz export available, but only commit the optimized files
+# that are already tracked and used by this sample website.
+images/
+fonts/
+js/
+css/
