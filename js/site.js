@@ -4,7 +4,8 @@
   const digits = phone.replace(/\D/g, '');
   const message = encodeURIComponent(config.whatsappMessage || 'Hello, I would like to book a photography session.');
   const whatsapp = `https://web.whatsapp.com/send?phone=${digits}&text=${message}&type=phone_number&app_absent=0`;
-  const map = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(config.address || '')}`;
+  const map = config.mapUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(config.address || '')}`;
+  const mapEmbed = config.mapEmbedUrl || `https://www.google.com/maps?q=${encodeURIComponent(config.address || '')}&output=embed`;
 
   document.title = config.studio || document.title;
   document.querySelectorAll('.js-studio').forEach(el => el.textContent = config.studio);
@@ -14,6 +15,7 @@
   document.querySelectorAll('.js-phone-link').forEach(el => el.href = `tel:${phone}`);
   document.querySelectorAll('.js-instagram').forEach(el => { el.href = config.instagram; el.target = '_blank'; el.rel = 'noopener'; });
   document.querySelectorAll('.js-map').forEach(el => { el.href = map; el.target = '_blank'; el.rel = 'noopener'; });
+  document.querySelectorAll('.js-map-embed').forEach(el => { el.src = mapEmbed; });
   document.getElementById('year').textContent = new Date().getFullYear();
 
   const button = document.querySelector('.menu-button');
