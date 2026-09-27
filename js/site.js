@@ -1,4 +1,12 @@
 (() => {
+  if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
+  const cleanHomepageUrl = () => window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
+  if (!window.location.hash) window.scrollTo(0, 0);
+  window.addEventListener('pageshow', () => {
+    if (window.location.hash === '#reviews') window.setTimeout(cleanHomepageUrl, 0);
+    else if (!window.location.hash) window.scrollTo(0, 0);
+  });
+
   const config = window.SITE_CONFIG || {};
   const phone = String(config.phone || '').replace(/[^\d+]/g, '');
   const digits = phone.replace(/\D/g, '');
@@ -80,9 +88,12 @@
     });
 
     document.querySelectorAll('a[href="#reviews"]').forEach(link => {
-      link.addEventListener('click', () => {
+      link.addEventListener('click', event => {
+        event.preventDefault();
         stop();
         track.scrollTo({ left: 0, behavior: 'auto' });
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        cleanHomepageUrl();
         window.setTimeout(start, 500);
       });
     });
