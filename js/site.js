@@ -51,6 +51,54 @@
     });
   }
 
+  document.querySelectorAll('[data-testimonial-track]').forEach(track => {
+    const section = track.closest('.reviews-section');
+    const card = track.querySelector('.review-card');
+    if (!section || !card) return;
+
+    const move = direction => {
+      const gap = parseFloat(getComputedStyle(track).gap) || 0;
+      const step = card.getBoundingClientRect().width + gap;
+      const max = track.scrollWidth - track.clientWidth;
+      const next = direction > 0 && track.scrollLeft >= max - 8
+        ? 0
+        : Math.max(0, Math.min(max, track.scrollLeft + step * direction));
+      track.scrollTo({ left: next, behavior: 'smooth' });
+    };
+
+    const motionAllowed = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let timer;
+    const stop = () => window.clearInterval(timer);
+    const start = () => {
+      if (!motionAllowed) return;
+      stop();
+      timer = window.setInterval(() => move(1), 8000);
+    };
+
+    section.querySelectorAll('[data-testimonial-direction]').forEach(control => {
+      control.addEventListener('click', () => move(control.dataset.testimonialDirection === 'next' ? 1 : -1));
+    });
+
+    document.querySelectorAll('a[href="#reviews"]').forEach(link => {
+      link.addEventListener('click', () => {
+        stop();
+        track.scrollTo({ left: 0, behavior: 'auto' });
+        window.setTimeout(start, 500);
+      });
+    });
+
+    if (motionAllowed) {
+      const visibility = new IntersectionObserver(entries => {
+        entries.forEach(entry => entry.isIntersecting ? start() : stop());
+      }, { threshold: .2 });
+      visibility.observe(section);
+      section.addEventListener('pointerenter', stop);
+      section.addEventListener('pointerleave', start);
+      section.addEventListener('focusin', stop);
+      section.addEventListener('focusout', start);
+    }
+  });
+
   const categoryTabs = [...document.querySelectorAll('[data-category-tab]')];
   const categoryPanels = [...document.querySelectorAll('[data-category-panel]')];
   if (categoryTabs.length && categoryPanels.length) {
